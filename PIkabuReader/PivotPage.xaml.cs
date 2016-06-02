@@ -126,7 +126,7 @@ namespace PIkabuReader
         {
             // Navigate to the appropriate destination page, configuring the new page
             // by passing required information as a navigation parameter
-            var itemId = ((PikabuPost)e.ClickedItem).Id;
+            var itemId = ((PikabuPost)e.ClickedItem);
             if (!Frame.Navigate(typeof(ItemPage), itemId))
             {
                 throw new Exception(this.resourceLoader.GetString("NavigationFailedExceptionMessage"));

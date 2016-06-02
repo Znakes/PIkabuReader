@@ -43,7 +43,7 @@
                   to show details for the current item
         -->
         <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,9.5,19,0">
-            <TextBox Text="{Binding }"></TextBox>
+            <WebView Name="Web" Source="{Binding PostHref}" />
         </Grid>
     </Grid>
 </Page>

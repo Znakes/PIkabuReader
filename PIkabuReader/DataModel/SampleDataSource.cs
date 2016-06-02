@@ -106,11 +106,10 @@ namespace PIkabuReader.Data
             return sdg;
         }
 
-        public static async Task<PikabuPost> GetItemAsync(int uniqueId)
+        public static async Task<PikabuPost> GetItemAsync(PikabuPost post)
         {
-            await _sampleDataSource.GetSampleDataAsync();
             // Simple linear search is acceptable for small data sets
-            var matches = _sampleDataSource.Groups.SelectMany(group => group.Items).Where((item) => item.Id.Equals(uniqueId));
+            var matches = _sampleDataSource.Groups.SelectMany(group => group.Items).Where((item) => item.Equals(post));
             if (matches.Any()) return matches.First();
             return null;
         }
