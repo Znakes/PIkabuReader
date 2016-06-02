@@ -71,8 +71,6 @@ namespace PIkabuReader
             // TODO: Create an appropriate data model for your problem domain to replace the sample data.
             var item = await SampleDataSource.GetItemAsync((int)e.NavigationParameter);
             this.DefaultViewModel["Item"] = item;
-
-            anton:
         }
 
         /// <summary>

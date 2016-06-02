@@ -33,7 +33,7 @@ namespace PIkabuReader.Core.ContentLoader
 
         HttpClient http = new HttpClient();
 
-        public async Task GetPostsByPage(int pageNumber, PikabuSection section)
+        public async Task<PikabuPost[]> GetPostsByPage(int pageNumber, PikabuSection section)
         {
             string sectionStr = string.Empty;
 
@@ -54,13 +54,15 @@ namespace PIkabuReader.Core.ContentLoader
 
             var responce = await http.GetAsync(new Uri(requestString));
             responce.EnsureSuccessStatusCode();
-            ParsePageToObjects(WebUtility.HtmlDecode(await responce.Content.ReadAsStringAsync()));
+            return ParsePageToObjects(WebUtility.HtmlDecode(await responce.Content.ReadAsStringAsync()));
 
         }
 
-        private void ParsePageToObjects(string htmltext)
+        private PikabuPost[] ParsePageToObjects(string htmltext)
         {
-            
+            PikabuPostsParser parser = new PikabuPostsParser();
+
+            return parser.GetPosts(htmltext);
         }
     }
 }

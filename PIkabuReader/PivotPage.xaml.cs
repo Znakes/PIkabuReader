@@ -81,12 +81,10 @@ namespace PIkabuReader
         /// </summary>
         private async void AddAppBarButton_Click(object sender, RoutedEventArgs e)
         {
-
             PikabuApi api = new PikabuApi();
 
-            await api.GetPostsByPage(2, PikabuSection.Fresh);
-
-
+            var posts = await api.GetPostsByPage(2, PikabuSection.Fresh);
+            
             string groupName = this.pivot.SelectedIndex == 0 ? FirstGroupName : SecondGroupName;
 
             switch (pivot.SelectedIndex)
@@ -112,19 +110,17 @@ namespace PIkabuReader
             //    this.resourceLoader.GetString("NewItemDescription"),
             //    string.Empty
 
-            var newItem = new PikabuPost()
+            foreach (var pikabuPost in posts)
             {
-                Autor = "Pidor",
-                Id = 8,
-                Title = "Hui"
-            };
+                group.Items.Add(pikabuPost);
+            }
 
-            group.Items.Add(newItem);
+            
 
             // Scroll the new item into view.
             var container = this.pivot.ContainerFromIndex(this.pivot.SelectedIndex) as ContentControl;
             var listView = container.ContentTemplateRoot as ListView;
-            listView.ScrollIntoView(newItem, ScrollIntoViewAlignment.Leading);
+            listView.ScrollIntoView(posts.First(), ScrollIntoViewAlignment.Leading);
         }
 
         /// <summary>
