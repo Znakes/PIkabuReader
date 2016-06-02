@@ -19,6 +19,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using PIkabuReader.Core.ContentLoader;
+using PIkabuReader.Utils.Extensions;
 
 // The Pivot Application template is documented at http://go.microsoft.com/fwlink/?LinkID=391641
 
@@ -81,46 +82,41 @@ namespace PIkabuReader
         /// </summary>
         private async void AddAppBarButton_Click(object sender, RoutedEventArgs e)
         {
-            PikabuApi api = new PikabuApi();
 
-            var posts = await api.GetPostsByPage(2, PikabuSection.Fresh);
-            
-            string groupName = this.pivot.SelectedIndex == 0 ? FirstGroupName : SecondGroupName;
+            string groupName = String.Empty;
+            PikabuSection section = PikabuSection.None;
 
             switch (pivot.SelectedIndex)
             {
                 case 0:
                     groupName = FirstGroupName;
+                    section = PikabuSection.Hot;
                     break;
                 case 1:
                     groupName = SecondGroupName;
+                    section = PikabuSection.Best;
                     break;
                 case 2:
                     groupName = ThirdGroupName;
+                    section = PikabuSection.Fresh;
                     break;
             }
 
+            PikabuApi api = new PikabuApi();
+            var posts = await api.GetPostsByPage(1, section);
+
             var group = this.DefaultViewModel[groupName] as SampleDataGroup;
             var nextItemId = group.Items.Count + 1;
-            //var newItem = new SampleDataItem(
-            //    string.Format(CultureInfo.InvariantCulture, "Group-{0}-Item-{1}", this.pivot.SelectedIndex + 1, nextItemId),
-            //    string.Format(CultureInfo.CurrentCulture, this.resourceLoader.GetString("NewItemTitle"), nextItemId),
-            //    string.Empty,
-            //    string.Empty,
-            //    this.resourceLoader.GetString("NewItemDescription"),
-            //    string.Empty
 
-            foreach (var pikabuPost in posts)
+            foreach (var pikabuPost in posts.Except(group.Items, (p) =>p.Id))
             {
-                group.Items.Add(pikabuPost);
+                group.Items.Insert(0,pikabuPost);
             }
-
             
-
             // Scroll the new item into view.
             var container = this.pivot.ContainerFromIndex(this.pivot.SelectedIndex) as ContentControl;
             var listView = container.ContentTemplateRoot as ListView;
-            listView.ScrollIntoView(posts.First(), ScrollIntoViewAlignment.Leading);
+            listView.ScrollIntoView(group.Items.First(), ScrollIntoViewAlignment.Leading);
         }
 
         /// <summary>
@@ -151,7 +147,7 @@ namespace PIkabuReader
         private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
             // TODO: Create an appropriate data model for your problem domain to replace the sample data
-            var sampleDataGroup = await SampleDataSource.GetGroupAsync("Group-1");
+            var sampleDataGroup = await SampleDataSource.GetGroupAsync(PikabuSection.Hot);
             this.DefaultViewModel[FirstGroupName] = sampleDataGroup;
         }
 
@@ -160,7 +156,7 @@ namespace PIkabuReader
         /// </summary>
         private async void SecondPivot_Loaded(object sender, RoutedEventArgs e)
         {
-            var sampleDataGroup = await SampleDataSource.GetGroupAsync("Group-2");
+            var sampleDataGroup = await SampleDataSource.GetGroupAsync(PikabuSection.Best);
             this.DefaultViewModel[SecondGroupName] = sampleDataGroup;
         }
 
@@ -169,7 +165,7 @@ namespace PIkabuReader
         /// </summary>
         private async void ThirdPivot_Loaded(object sender, RoutedEventArgs e)
         {
-            var sampleDataGroup = await SampleDataSource.GetGroupAsync("Group-3");
+            var sampleDataGroup = await SampleDataSource.GetGroupAsync(PikabuSection.Fresh);
             this.DefaultViewModel[ThirdGroupName] = sampleDataGroup;
         }
 

@@ -52,13 +52,13 @@ namespace PIkabuReader.Data
     /// </summary>
     public class SampleDataGroup
     {
-        public SampleDataGroup(String uniqueId, String title, String subtitle, String imagePath, String description)
+        public SampleDataGroup()
         {
-            this.UniqueId = uniqueId;
-            this.Title = title;
-            this.Subtitle = subtitle;
-            this.Description = description;
-            this.ImagePath = imagePath;
+            //this.UniqueId = uniqueId;
+            //this.Title = title;
+            //this.Subtitle = subtitle;
+            //this.Description = description;
+            //this.ImagePath = imagePath;
             this.Items = new ObservableCollection<PikabuPost>();
         }
 
@@ -91,20 +91,19 @@ namespace PIkabuReader.Data
             get { return this._groups; }
         }
 
-        public static async Task<IEnumerable<SampleDataGroup>> GetGroupsAsync()
+        public static async Task<SampleDataGroup> GetGroupAsync(PikabuSection section)
         {
-            await _sampleDataSource.GetSampleDataAsync();
+            var api = new PikabuApi();
+            var posts = await api.GetPostsByPage(1, section);
+            
+            SampleDataGroup sdg = new SampleDataGroup();
+            
+            foreach (var post in posts)
+            {
+                sdg.Items.Add(post);
+            }
 
-            return _sampleDataSource.Groups;
-        }
-
-        public static async Task<SampleDataGroup> GetGroupAsync(string uniqueId)
-        {
-            await _sampleDataSource.GetSampleDataAsync();
-            // Simple linear search is acceptable for small data sets
-            var matches = _sampleDataSource.Groups.Where((group) => group.UniqueId.Equals(uniqueId));
-            if (matches.Count() == 1) return matches.First();
-            return null;
+            return sdg;
         }
 
         public static async Task<PikabuPost> GetItemAsync(int uniqueId)
@@ -131,11 +130,7 @@ namespace PIkabuReader.Data
             foreach (JsonValue groupValue in jsonArray)
             {
                 JsonObject groupObject = groupValue.GetObject();
-                SampleDataGroup group = new SampleDataGroup(groupObject["UniqueId"].GetString(),
-                                                            groupObject["Title"].GetString(),
-                                                            groupObject["Subtitle"].GetString(),
-                                                            groupObject["ImagePath"].GetString(),
-                                                            groupObject["Description"].GetString());
+                SampleDataGroup group = new SampleDataGroup();
 
                 foreach (JsonValue itemValue in groupObject["Items"].GetArray())
                 {

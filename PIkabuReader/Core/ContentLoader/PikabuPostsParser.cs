@@ -9,7 +9,7 @@ using HtmlAgilityPack;
 
 namespace PIkabuReader.Core.ContentLoader
 {
-    public class PikabuPost
+    public class PikabuPost 
     {
         /// <summary>
         ///     Id поста
@@ -75,6 +75,17 @@ namespace PIkabuReader.Core.ContentLoader
         ///     post_tag
         /// </remarks>
         public string[] Tags { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as PikabuPost;
+            if (other != null)
+            {
+                return this.Id == other.Id;
+            }
+
+            return false;
+        }
     }
 
 

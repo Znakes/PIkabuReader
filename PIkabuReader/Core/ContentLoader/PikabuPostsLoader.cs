@@ -16,6 +16,7 @@ namespace PIkabuReader.Core.ContentLoader
 
     public enum PikabuSection
     {
+        None,
         Best,
         Hot,
         Fresh

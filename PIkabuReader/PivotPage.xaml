@@ -96,8 +96,8 @@
                 x:Uid="PivotItem3"
                 Margin="19,14.5,0,0"
                 Header="Свежее"
-                DataContext="{Binding SecondGroup}"
-                d:DataContext="{Binding Groups[1], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}">
+                DataContext="{Binding ThirdGroup}"
+                d:DataContext="{Binding Groups[2], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}">
                 <!--Double line list no text wrapping-->
                 <ListView
                     ItemsSource="{Binding Items}"
