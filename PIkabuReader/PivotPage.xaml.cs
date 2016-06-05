@@ -82,7 +82,11 @@ namespace PIkabuReader
         /// </summary>
         private async void AddAppBarButton_Click(object sender, RoutedEventArgs e)
         {
+            await AddOrUpdatePostsList();
+        }
 
+        private async System.Threading.Tasks.Task AddOrUpdatePostsList()
+        {
             string groupName = String.Empty;
             PikabuSection section = PikabuSection.None;
 
@@ -108,11 +112,11 @@ namespace PIkabuReader
             var group = this.DefaultViewModel[groupName] as SampleDataGroup;
             var nextItemId = group.Items.Count + 1;
 
-            foreach (var pikabuPost in posts.Except(group.Items, (p) =>p.Id))
+            foreach (var pikabuPost in posts.Except(group.Items, (p) => p.Id))
             {
-                group.Items.Insert(0,pikabuPost);
+                group.Items.Insert(0, pikabuPost);
             }
-            
+
             // Scroll the new item into view.
             var container = this.pivot.ContainerFromIndex(this.pivot.SelectedIndex) as ContentControl;
             var listView = container.ContentTemplateRoot as ListView;
@@ -146,9 +150,11 @@ namespace PIkabuReader
         /// session. The state will be null the first time a page is visited.</param>
         private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            // TODO: Create an appropriate data model for your problem domain to replace the sample data
-            var sampleDataGroup = await SampleDataSource.GetGroupAsync(PikabuSection.Hot);
-            this.DefaultViewModel[FirstGroupName] = sampleDataGroup;
+            if (!this.DefaultViewModel.ContainsKey(SecondGroupName))
+            {
+                var sampleDataGroup = await SampleDataSource.GetGroupAsync(PikabuSection.Hot);
+                DefaultViewModel[FirstGroupName] = sampleDataGroup;
+            }
         }
 
         /// <summary>
@@ -156,8 +162,11 @@ namespace PIkabuReader
         /// </summary>
         private async void SecondPivot_Loaded(object sender, RoutedEventArgs e)
         {
-            var sampleDataGroup = await SampleDataSource.GetGroupAsync(PikabuSection.Best);
-            this.DefaultViewModel[SecondGroupName] = sampleDataGroup;
+            if (!this.DefaultViewModel.ContainsKey(SecondGroupName))
+            {
+                var sampleDataGroup = await SampleDataSource.GetGroupAsync(PikabuSection.Best);
+                DefaultViewModel[SecondGroupName] = sampleDataGroup;
+            }
         }
 
         /// <summary>
@@ -165,8 +174,11 @@ namespace PIkabuReader
         /// </summary>
         private async void ThirdPivot_Loaded(object sender, RoutedEventArgs e)
         {
-            var sampleDataGroup = await SampleDataSource.GetGroupAsync(PikabuSection.Fresh);
-            this.DefaultViewModel[ThirdGroupName] = sampleDataGroup;
+            if (!this.DefaultViewModel.ContainsKey(SecondGroupName))
+            {
+                var sampleDataGroup = await SampleDataSource.GetGroupAsync(PikabuSection.Fresh);
+                DefaultViewModel[ThirdGroupName] = sampleDataGroup;
+            }
         }
 
         #region NavigationHelper registration

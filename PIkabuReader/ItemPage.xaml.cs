@@ -113,5 +113,9 @@ namespace PIkabuReader
         }
 
         #endregion
+
+        private void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+        }
     }
 }

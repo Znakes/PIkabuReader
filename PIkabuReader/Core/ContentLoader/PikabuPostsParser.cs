@@ -9,6 +9,14 @@ using HtmlAgilityPack;
 
 namespace PIkabuReader.Core.ContentLoader
 {
+    public enum PostType
+    {
+        None, 
+        OnlyText,
+        BigImage,
+        CompositeText // coub, youtube, text, etc
+    }
+    
     public class PikabuPost 
     {
         /// <summary>
@@ -76,6 +84,11 @@ namespace PIkabuReader.Core.ContentLoader
         /// </remarks>
         public string[] Tags { get; set; }
 
+        /// <summary>
+        /// Тип поста
+        /// </summary>
+        public PostType PostType { get; set; }
+
         public override bool Equals(object obj)
         {
             var other = obj as PikabuPost;
@@ -99,6 +112,7 @@ namespace PIkabuReader.Core.ContentLoader
             var html = new HtmlDocument();
             html.LoadHtml(htmlText);
 
+
             var container =
                 html.GetElementbyId(storiesContainer)
                     .ChildNodes.Where(cn => cn.Attributes.Any(a => a.Value == "post" && a.Name == "class")).ToArray();
@@ -110,19 +124,19 @@ namespace PIkabuReader.Core.ContentLoader
 
                 try
                 {
-                    var titleNode = GetByClassName(post, @"post_title page_title");
-                    var href = titleNode.ChildNodes.First().Attributes["href"].Value;
-                    var author = GetByClassName(post, @"post_author  boldlabel", true).InnerText;
-                    var rating = GetByClassName(post, @"post_rating_count control label", true);
+                    var titleNode = GetByClassName(post,"h2", @"post_title page_title");
+                    var href = titleNode.First().ChildNodes.First().Attributes["href"].Value;
+                    var author = GetByClassName(post, "a", @"post_author  boldlabel");
+                    var rating = GetByClassName(post, "span", @"post_rating_count control label");
                     var id = int.Parse(post.Attributes["data-story-id"].Value);
 
                     var pikabuPost = new PikabuPost
                     {
                         Id = id,
-                        Title = titleNode.InnerText,
+                        Title = titleNode.First().InnerText,
                         PostHref = href,
-                        Autor = author,
-                        Rating = int.Parse(rating?.InnerText ?? "0")
+                        Autor = author?.First().InnerText,
+                        Rating = int.Parse(rating.First().InnerText ?? "0")
                     };
 
                     posts.Add(pikabuPost);
@@ -138,25 +152,12 @@ namespace PIkabuReader.Core.ContentLoader
         }
 
 
-        private HtmlNode GetByClassName(HtmlNode parent, string className, bool recursive = false)
+
+        private HtmlNode[] GetByClassName(HtmlNode parent, string type, string className )
         {
-            var htmlNode = parent.ChildNodes.FirstOrDefault(
-                cn => cn.Attributes.Any(a => a.Value.Contains(className) && a.Name == "class"));
-
-            if (htmlNode == null)
-            {
-                if (recursive && parent.ChildNodes.Any())
-                {
-                    foreach (var childNode in parent.ChildNodes)
-                    {
-                        htmlNode = GetByClassName(childNode, className, true);
-                        if (htmlNode != null)
-                            return htmlNode;
-                    }
-                }
-            }
-
-            return htmlNode;
+            return parent.Descendants(type).Where(
+                d =>d.Attributes.Contains("class") && d.Attributes["class"].Value.Contains(className)
+                    ).ToArray();
         }
     }
 }
